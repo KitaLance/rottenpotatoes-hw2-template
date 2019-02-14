@@ -11,18 +11,12 @@ class MoviesController < ApplicationController
   end
 
   def index
-    # nuke session
-    # if !params[:ratings] && !params[:sort]
-    #     session.clear
-    # end
-    
     @all_ratings = ['G','PG','PG-13','R']
     # check boxes' list
     filter_rating = []
     if params[:ratings]
-      params[:ratings].each do |rate|
-        filter_rating << rate
-      end
+      filter_rating = params[:ratings] if params[:ratings].is_a? Array
+      filter_rating = params[:ratings].keys if params[:ratings].is_a? Hash
       session[:rating] = filter_rating
     else
       if !params[:sort]
@@ -31,20 +25,13 @@ class MoviesController < ApplicationController
     end
     # remember sorting set
     session[:sort] = params[:sort] if params[:sort]
-    # checked ratings' list
-    @checked_ratings = session[:rating]
-    if @checked_ratings.empty?
-      @checked_ratings = @all_ratings
-    end
     
     if session[:rating] or session[:sort]
       case session[:sort]
       when "title"
         @title_sort = "hilite"  # yellow background header
-        #@movies = Movie.order("title").where(rating: filter_rating) # order movies by name
       when "release_date"
         @release_date_sort = "hilite" # yellow background header
-        #@movies = Movie.order("release_date").where(rating: filter_rating) # order movies by release date
       end
       @movies = Movie.order(session[:sort]).where(rating: session[:rating])
     else
