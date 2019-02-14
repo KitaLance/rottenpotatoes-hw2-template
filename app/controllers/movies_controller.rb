@@ -11,19 +11,30 @@ class MoviesController < ApplicationController
   end
 
   def index
-    if params[:sort]
+    @all_ratings = ['G','PG','PG-13','R']
+    # check boxes' list
+    filter_rating = []
+    if params[:ratings]
+      params[:ratings].each do |rate|
+        filter_rating << rate
+      end
+    else
+      filter_rating = @all_ratings
+    end
+    
+    if params[:ratings] or params[:sort]
       case params[:sort]
       when "title"
         @title_sort = "hilite"  # yellow background header
-        @movies = Movie.order("title").all # order movies by name
+        #@movies = Movie.order("title").where(rating: filter_rating) # order movies by name
       when "release_date"
         @release_date_sort = "hilite" # yellow background header
-        @movies = Movie.order("release_date").all # order movies by release date
+        #@movies = Movie.order("release_date").where(rating: filter_rating) # order movies by release date
       end
+      @movies = Movie.order(params[:sort]).where(rating: filter_rating)
     else
       @movies = Movie.all
     end
-    #@movies = Movie.all
   end
 
   def new
