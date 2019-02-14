@@ -12,9 +12,9 @@ class MoviesController < ApplicationController
 
   def index
     # nuke session
-    if !params[:ratings] && !params[:sort]
-        session.clear
-    end
+    # if !params[:ratings] && !params[:sort]
+    #     session.clear
+    # end
     
     @all_ratings = ['G','PG','PG-13','R']
     # check boxes' list
@@ -25,13 +25,17 @@ class MoviesController < ApplicationController
       end
       session[:rating] = filter_rating
     else
-      filter_rating = @all_ratings
-      if !session[:rating]
-            session[:rating] = filter_rating
+      if !params[:sort]
+        session[:rating] = @all_ratings
       end
     end
     # remember sorting set
     session[:sort] = params[:sort] if params[:sort]
+    # checked ratings' list
+    @checked_ratings = session[:rating]
+    if @checked_ratings.empty?
+      @checked_ratings = @all_ratings
+    end
     
     if session[:rating] or session[:sort]
       case session[:sort]
